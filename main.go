@@ -1,21 +1,20 @@
 package main
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/tker-78/chatfluent/data"
 )
 
 func main() {
 	user := data.User{
-		Name:     "kktak",
-		Email:    "kktak02@gmail.com",
+		Name:     "yyyy",
+		Email:    "yyyy@gmail.com",
 		Password: "password",
 	}
 
-	err := user.Create()
-	if err != nil {
-		log.Println(err)
-	}
+	user.Create()
+
+	fmt.Println(data.Users())
 
 }

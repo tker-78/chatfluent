@@ -14,48 +14,101 @@ type User struct {
 }
 
 type Session struct {
-	Id       int
-	Uuid     string
-	Email    string
-	UserId   string
-	CreateAt time.Time
+	Id        int
+	Uuid      string
+	Email     string
+	UserId    string
+	CreatedAt time.Time
 }
 
 // ### Sesson ###
-// Create a new session for an existing user
+// Todo: Create a new session for an existing user
 func (user *User) CreateSession() (Session, error) {
+	cmd := "INSERT INTO sessions (uuid, email, user_id, created_at) values($1, $2, $3, $4) returning id , uuid, email, user_id, created_at"
+	stmt, err := DbConnection.Prepare(cmd)
+	if err != nil {
+		return Session{}, err
+	}
+	defer stmt.Close()
 
-	return Session{}, nil
+	row := stmt.QueryRow(createUUID(), user.Email, user.Id, time.Now())
+	session := Session{}
+	row.Scan(&session.Id, &session.Uuid, &session.Email, &session.CreatedAt)
+
+	return session, err
 }
 
-// Get the session for an existing user
+// Todo: Get the session for an existing user
 func (user *User) Session() (Session, error) {
-
-	return Session{}, nil
+	cmd := "SELECT (uuid, email, user_id, created_at) FROM sessions WHERE user_id = $1"
+	row := DbConnection.QueryRow(cmd, user.Id)
+	session := Session{}
+	err := row.Scan(&session.Uuid, &session.Email, &session.UserId, &session.CreatedAt)
+	if err != nil {
+		return Session{}, err
+	}
+	return session, nil
 }
 
-// Check if session is valid in the database
+// Todo: Check if session is valid in the database
 func (session *Session) Check() (bool, error) {
+	cmd := "SELECT (id, uuid, email, user_id, created_at) FROM sessions WHERE uuid = $1"
+	stmt, err := DbConnection.Prepare(cmd)
+	if err != nil {
+		return false, err
+	}
+	defer stmt.Close()
 
-	return false, nil
+	row := stmt.QueryRow(session.Uuid)
+	row.Scan(&session.Id, &session.Uuid, &session.Email, &session.UserId, &session.CreatedAt)
+	if session.Id != 0 {
+		return true, nil
+	} else {
+		return false, nil
+	}
 }
 
-// Delete session from database
+// Todo: Delete session from database
 func (session *Session) DeleteByUUID() error {
+	cmd := "DELETE FROM sessions WHERE uuid = $1"
+	stmt, err := DbConnection.Prepare(cmd)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
 
-	return nil
+	_, err = stmt.Exec(session.Uuid)
+	if err != nil {
+		return err
+	}
+
+	return err
 }
 
-// Get the user from the session
+// Todo: Get the user from the session
 func (session *Session) User() (User, error) {
+	cmd := "SELECT (id, uuid, name, email, created_at) FROM users WHERE ID = $1"
+	stmt, err := DbConnection.Prepare(cmd)
+	if err != nil {
+		return User{}, err
+	}
+	defer stmt.Close()
 
-	return User{}, nil
+	row := stmt.QueryRow(session.UserId)
+	user := User{}
+	row.Scan(&user.Id, &user.Uuid, &user.Name, &user.Email, &user.CreatedAt)
+
+	return user, err
 }
 
-// Delete all sessions from database
+// Todo: Delete all sessions from database
 func SessionDeleteAll() error {
-
-	return nil
+	cmd := "DELETE FROM sessions"
+	_, err := DbConnection.Exec(cmd)
+	if err != nil {
+		return err
+	}
+	return err
 }
 
 // ### User ###
@@ -103,24 +156,70 @@ func (user *User) Update() error {
 
 // Todo: Delete all users from database
 func UserDeleteAll() error {
+	cmd := "DELETE FROM users;"
 
-	return nil
+	_, err := DbConnection.Exec(cmd)
+	if err != nil {
+		return err
+	}
+
+	return err
 }
 
 // Todo: Get all users in the database and returns it
 func Users() ([]User, error) {
+	cmd := "SELECT id, uuid, name, email, password, created_at FROM users;"
+	stmt, err := DbConnection.Prepare(cmd)
+	if err != nil {
+		return []User{}, err
+	}
+	defer stmt.Close()
 
-	return []User{}, nil
+	rows, err := stmt.Query()
+	if err != nil {
+		return []User{}, err
+	}
+	defer rows.Close()
+
+	var users []User
+	for rows.Next() {
+		var user User
+		// Todo: passwordは暗号化が必要
+		rows.Scan(&user.Id, &user.Uuid, &user.Name, &user.Email, &user.Password, &user.CreatedAt)
+		users = append(users, user)
+	}
+
+	return users, nil
 }
 
 // Todo: Get a single user given the email
-func UserByEmail() (User, error) {
+func UserByEmail(email string) (User, error) {
+	cmd := "SELECT id, uuid, name, email, password, created_at FROM users WHERE email = $1"
+	stmt, err := DbConnection.Prepare(cmd)
+	if err != nil {
+		return User{}, err
+	}
+	defer stmt.Close()
 
-	return User{}, nil
+	row := stmt.QueryRow(email)
+	user := User{}
+	row.Scan(&user.Id, &user.Uuid, &user.Email, &user.Password, &user.CreatedAt)
+
+	return user, err
 }
 
 // Todo: Get a single user given the UUID
-func UserByUUID() (User, error) {
+func UserByUUID(uuid string) (User, error) {
+	cmd := "SELECT id, uuid, name, email, password, created_at FROM users WHERE uuid = $1"
+	stmt, err := DbConnection.Prepare(cmd)
+	if err != nil {
+		return User{}, err
+	}
+	defer stmt.Close()
+	row := stmt.QueryRow(uuid)
+	user := User{}
+	row.Scan(&user.Id, &user.Uuid, &user.Name, &user.Email, &user.Password, &user.CreatedAt)
 
-	return User{}, nil
+	return user, err
+
 }
