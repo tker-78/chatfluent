@@ -1,20 +1,12 @@
 package main
 
-import (
-	"fmt"
-
-	"github.com/tker-78/chatfluent/data"
-)
+import "net/http"
 
 func main() {
-	user := data.User{
-		Name:     "yyyy",
-		Email:    "yyyy@gmail.com",
-		Password: "password",
-	}
 
-	user.Create()
-
-	fmt.Println(data.Users())
+	// handle static assets
+	mux := http.NewServeMux()
+	files := http.FileServer(http.Dir(config.Static))
+	mux.Handle("/static/", http.StripPrefix("/static/", files))
 
 }

@@ -123,7 +123,7 @@ func (user *User) Create() error {
 	defer stmt.Close()
 
 	// UUIDを生成して、データベースに保存する
-	rows := stmt.QueryRow(createUUID(), user.Name, user.Email, user.Password, time.Now())
+	rows := stmt.QueryRow(createUUID(), user.Name, user.Email, Encrypt(user.Password), time.Now())
 	// user構造体にスキャンする
 	err = rows.Scan(&user.Uuid, &user.Name, &user.Email, &user.Password, &user.CreatedAt)
 
