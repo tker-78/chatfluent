@@ -1,4 +1,5 @@
 drop table sessions;
+drop table threads;
 drop table users;
 
 CREATE TABLE IF NOT EXISTS users (
@@ -14,6 +15,14 @@ CREATE TABLE IF NOT EXISTS sessions (
   id SERIAL PRIMARY KEY,
   uuid VARCHAR(64) NOT NULL UNIQUE,
   email VARCHAR(225),
+  user_id INTEGER REFERENCES users(id),
+  created_at TIMESTAMP NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS threads (
+  id SERIAL PRIMARY KEY,
+  uuid VARCHAR(64) NOT NULL UNIQUE,
+  topic VARCHAR(255),
   user_id INTEGER REFERENCES users(id),
   created_at TIMESTAMP NOT NULL
 );
