@@ -1,4 +1,5 @@
 drop table sessions;
+drop table posts;
 drop table threads;
 drop table users;
 
@@ -24,5 +25,14 @@ CREATE TABLE IF NOT EXISTS threads (
   uuid VARCHAR(64) NOT NULL UNIQUE,
   topic VARCHAR(255),
   user_id INTEGER REFERENCES users(id),
+  created_at TIMESTAMP NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS posts (
+  id SERIAL PRIMARY KEY,
+  uuid VARCHAR(64) NOT NULL UNIQUE,
+  body TEXT,
+  user_id INTEGER REFERENCES users(id),
+  thread_id INTEGER REFERENCES threads(id),
   created_at TIMESTAMP NOT NULL
 );

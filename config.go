@@ -2,9 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
-	"html/template"
 	"log"
+	"net/http"
 	"os"
 )
 
@@ -32,22 +31,19 @@ func loadConfig() {
 		log.Fatalln("Cannot open config file", err)
 	}
 	decoder := json.NewDecoder(file)
-	config := Configulation{}
+	config = Configulation{}
 	err = decoder.Decode(&config)
 	if err != nil {
 		log.Fatalln("Cannot get configlation from file", err)
 	}
 }
 
-// parse HTML templates
-// 各route_authから呼び出す
-func parseTemplateFiles(filenames ...string) (t *template.Template) {
-	var files []string
-	t = template.New("layout")
-	for _, file := range filenames {
-		files = append(files, fmt.Sprintf("templates/%s.html", file))
-	}
+// parse template files
+// Todo: will make if it is necessary to be made.
 
-	t = template.Must(t.ParseFiles(files...))
-	return
+// generateHTML
+
+func generateHTML(w http.ResponseWriter, data interface{}, filenames ...string) {
+	var files []string
+
 }
