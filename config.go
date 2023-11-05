@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"log"
-	"net/http"
 	"os"
 )
 
@@ -36,14 +35,4 @@ func loadConfig() {
 	if err != nil {
 		log.Fatalln("Cannot get configlation from file", err)
 	}
-}
-
-// parse template files
-// Todo: will make if it is necessary to be made.
-
-// generateHTML
-
-func generateHTML(w http.ResponseWriter, data interface{}, filenames ...string) {
-	var files []string
-
 }

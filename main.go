@@ -8,11 +8,11 @@ import (
 func main() {
 
 	// マルチプレクサを使ってリクエストを受け付ける
-	mux := http.NewServeMux()
+	// mux := http.NewServeMux()
 
-	mux.HandleFunc("/", index)
-	mux.HandleFunc("/login", login)
-	http.ListenAndServe("0.0.0.0:8080", mux)
+	// mux.HandleFunc("/", index)
+	// mux.HandleFunc("/login", login)
+	// http.ListenAndServe("0.0.0.0:8080", mux)
 
 }
 
