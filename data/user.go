@@ -1,6 +1,7 @@
 package data
 
 import (
+	"log"
 	"time"
 )
 
@@ -194,17 +195,13 @@ func Users() ([]User, error) {
 
 // Todo: Get a single user given the email
 func UserByEmail(email string) (User, error) {
-	cmd := "SELECT id, uuid, name, email, password, created_at FROM users WHERE email = $1"
-	stmt, err := DbConnection.Prepare(cmd)
-	if err != nil {
-		return User{}, err
-	}
-	defer stmt.Close()
-
-	row := stmt.QueryRow(email)
+	cmd := "select id, uuid, email, password, created_at FROM users WHERE email = $1"
+	row := DbConnection.QueryRow(cmd, email)
 	user := User{}
-	row.Scan(&user.Id, &user.Uuid, &user.Email, &user.Password, &user.CreatedAt)
-
+	err := row.Scan(&user.Id, &user.Uuid, &user.Email, &user.Password, &user.CreatedAt)
+	if err != nil {
+		log.Fatalln(err)
+	}
 	return user, err
 }
 
