@@ -20,8 +20,8 @@ func main() {
 // Handlerの定義
 func home(w http.ResponseWriter, r *http.Request) {
 	// fmt.Fprintf(w, "hello world")
-	t, _ := template.ParseFiles("templates/layout.html", "templates/navbar.html", "templates/home.html")
-	t.ExecuteTemplate(w, "layout", "helloooo!!!")
+	t, _ := template.ParseFiles("templates/layout.html", "templates/home.html")
+	t.ExecuteTemplate(w, "layout", nil)
 
 }
 
