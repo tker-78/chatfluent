@@ -1,0 +1,37 @@
+{{ define "content" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <form class="form-signin center" role="form" action="/authenticate" method="post">
+    <h2 class="form-signin-heading">
+      <i class="fa fa-comments-o">
+        ChatFluent
+      </i>
+    </h2>
+    <input type="email" name="email" class="form-control" placeholder="Email" required autofocus>
+    <input type="password" name="password" class="form-control" placeholder="パスワード" required>
+    <br/>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">ログイン</button>
+    <br/>
+    <a class="lead pull-right" href="/signup">登録</a>
+  </form>
+</body>
+
+<style>
+  .form-signin {
+    max-width: 330px;
+  }
+  .form-signin .form-control {
+    position: relative;
+    height: auto;
+    padding: 10px;
+    font-size: 16px;
+  }
+</style>
+</html>
+{{ end }}

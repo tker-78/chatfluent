@@ -1,0 +1,31 @@
+{{ define "content" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up</title>
+</head>
+<body>
+  <form class="form-signin" role="form" action="/signup_account" method="post">
+    <h2 class="form-signin-heading">
+      <i class="fa fa-comments-o">
+        ChatFluent
+      </i>
+    </h2>
+    <div class="lead">登録</div>
+    <input id="name" type="text" name="name" class="form-control" placeholder="お名前" required autofocus>
+    <input type="email" name="email" class="form-control" placeholder="Email" required>
+    <input type="password" name="password" class="form-control" placeholder="パスワード" required>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">登録</button>
+  </form>  
+</body>
+
+<style>
+  .form-signin {
+    max-width: 330px;
+  }
+</style>
+</html>
+
+{{ end }}

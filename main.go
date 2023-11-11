@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"net/http"
 )
@@ -13,6 +12,7 @@ func main() {
 
 	mux.HandleFunc("/", home)
 	mux.HandleFunc("/login", login)
+	mux.HandleFunc("/signup", signupAccount)
 	http.ListenAndServe("0.0.0.0:8080", mux)
 
 }
@@ -27,12 +27,14 @@ func home(w http.ResponseWriter, r *http.Request) {
 
 // GET /login
 func login(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "login")
+	t, _ := template.ParseFiles("templates/layout.html", "templates/login.html")
+	t.ExecuteTemplate(w, "layout", nil)
 }
 
 // POST /signup
 func signupAccount(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "signup")
+	t, _ := template.ParseFiles("templates/layout.html", "templates/signup.html")
+	t.ExecuteTemplate(w, "layout", nil)
 
 }
 
