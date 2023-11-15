@@ -18,15 +18,26 @@ func main() {
 	mux.HandleFunc("/authenticate", authenticate)
 	mux.HandleFunc("/signup", signup)
 	mux.HandleFunc("/signup_account", signupAccount)
-	http.ListenAndServe("0.0.0.0:8080", mux)
+	mux.HandleFunc("/threads", threads)
+	http.ListenAndServe("0.0.0.0:5050", mux)
 
 }
 
 // Handlerの定義
 func home(w http.ResponseWriter, r *http.Request) {
-	// fmt.Fprintf(w, "hello world")
-	t, _ := template.ParseFiles("templates/layout.html", "templates/home.html")
-	t.ExecuteTemplate(w, "layout", nil)
+	// t, _ := template.ParseFiles("templates/layout.html", "templates/public.home.html")
+	// t.ExecuteTemplate(w, "layout", nil)
+
+	// login状態で表示するページを変える
+	_, err := session(w, r)
+	if err != nil {
+		log.Println(err, "error in checking session")
+		t, _ := template.ParseFiles("templates/layout.html", "templates/public.home.html")
+		t.ExecuteTemplate(w, "layout", nil)
+	} else {
+		t, _ := template.ParseFiles("templates/layout.html", "templates/private.home.html")
+		t.ExecuteTemplate(w, "layout", nil)
+	}
 
 }
 
@@ -66,6 +77,7 @@ func signupAccount(w http.ResponseWriter, r *http.Request) {
 
 // POST /authenticate
 func authenticate(w http.ResponseWriter, r *http.Request) {
+	// todo: session管理がうまくいかないので、今はパスする(2023/11/17 kinoshita)
 	err := r.ParseForm()
 	if err != nil {
 		log.Println(err)
@@ -87,6 +99,7 @@ func authenticate(w http.ResponseWriter, r *http.Request) {
 		}
 		http.SetCookie(w, &cookie)
 		log.Println("ログインしました。")
+		log.Println(r.Cookie("_cookie"))
 		http.Redirect(w, r, "/", http.StatusFound)
 	} else {
 		log.Println(user)
@@ -98,4 +111,10 @@ func authenticate(w http.ResponseWriter, r *http.Request) {
 // GET /logout
 func logout(w http.ResponseWriter, r *http.Request) {
 
+}
+
+// threadsの一覧ページ
+func threads(w http.ResponseWriter, r *http.Request) {
+	t, _ := template.ParseFiles("templates/layout.html", "templates/threads.html")
+	t.ExecuteTemplate(w, "layout", nil)
 }

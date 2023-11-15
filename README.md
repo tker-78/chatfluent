@@ -82,3 +82,45 @@ homeページの作成
 ```
 
 
+## ログイン状態の判定
+`route_main.go`に記述する.  
+
+オリジナルのソースコードは下記のようになっている。
+```go
+func index(w http.ResponseWriter, r *http.Request) {
+  threads, err := data.Threads()
+  if err != nil {
+    error_message(w, r, "error")
+  } else {
+    _, err := session(w, r)
+    if err != nil {
+      generateHTML(w, threads, "layout", "public.navbar", "index")
+    } else {
+      generateHTML(w, threads, "layout", "private.navbar", index)
+    }
+  }
+}
+```
+session()ヘルパーは、`config.go`に下記のように定義する。  
+
+```go
+// Userのログイン判定
+func session(w http.ResponseWriter, r *http.Request) (data.Session, error) {
+	cookie, err := r.Cookie("_cookie")
+	if err == nil {
+		sess := data.Session{Uuid: cookie.Value}
+		if ok, _ := sess.Check(); !ok {
+			err = errors.New("invalid session")
+		}
+
+	}
+	return data.Session{}, err
+}
+```
+
+
+
+
+
+
+

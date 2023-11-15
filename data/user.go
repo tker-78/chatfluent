@@ -26,15 +26,10 @@ type Session struct {
 // Todo: Create a new session for an existing user
 func (user *User) CreateSession() (Session, error) {
 	cmd := "INSERT INTO sessions (uuid, email, user_id, created_at) values($1, $2, $3, $4) returning id , uuid, email, user_id, created_at"
-	stmt, err := DbConnection.Prepare(cmd)
-	if err != nil {
-		return Session{}, err
-	}
-	defer stmt.Close()
 
-	row := stmt.QueryRow(createUUID(), user.Email, user.Id, time.Now())
+	row := DbConnection.QueryRow(cmd, createUUID(), user.Email, user.Id, time.Now())
 	session := Session{}
-	row.Scan(&session.Id, &session.Uuid, &session.Email, &session.CreatedAt)
+	err := row.Scan(&session.Id, &session.Uuid, &session.Email, &session.UserId, &session.CreatedAt)
 
 	return session, err
 }
@@ -54,14 +49,15 @@ func (user *User) Session() (Session, error) {
 // Todo: Check if session is valid in the database
 func (session *Session) Check() (bool, error) {
 	cmd := "SELECT (id, uuid, email, user_id, created_at) FROM sessions WHERE uuid = $1"
-	stmt, err := DbConnection.Prepare(cmd)
-	if err != nil {
-		return false, err
-	}
-	defer stmt.Close()
+	// stmt, err := DbConnection.Prepare(cmd)
+	// if err != nil {
+	// 	return false, err
+	// }
+	// defer stmt.Close()
 
-	row := stmt.QueryRow(session.Uuid)
+	row := DbConnection.QueryRow(cmd, session.Uuid)
 	row.Scan(&session.Id, &session.Uuid, &session.Email, &session.UserId, &session.CreatedAt)
+
 	if session.Id != 0 {
 		return true, nil
 	} else {
@@ -86,7 +82,7 @@ func (session *Session) DeleteByUUID() error {
 	return err
 }
 
-// Todo: Get the user from the session
+// Get the user from the session
 func (session *Session) User() (User, error) {
 	cmd := "SELECT (id, uuid, name, email, created_at) FROM users WHERE ID = $1"
 	stmt, err := DbConnection.Prepare(cmd)
@@ -102,7 +98,7 @@ func (session *Session) User() (User, error) {
 	return user, err
 }
 
-// Todo: Delete all sessions from database
+// Delete all sessions from database
 func SessionDeleteAll() error {
 	cmd := "DELETE FROM sessions"
 	_, err := DbConnection.Exec(cmd)

@@ -1,13 +1,18 @@
   {{ define "content" }}
   <div class="container">
-    <button class="btn btn-primary">Login</button>
+    <button class="btn btn-primary">
+      <a href="/login" style="color: white;">LogIn</a>
+    </button>
+    
+    <button class="btn btn-success">
+      <a href="/threads" style="color: white;">Threadを読む</a>
+    </button>
+
     <div class="container">
       <h2>What is this application?</h2>      
       <p>This application is the training application made by tker-78.</p>
       <p>This application helps you in learning foreign languages </p>
       <p>making memos in the chat format.</p>
-
-
 
       {{ . }}
     </div>
