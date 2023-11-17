@@ -116,5 +116,5 @@ func logout(w http.ResponseWriter, r *http.Request) {
 // threadsの一覧ページ
 func threads(w http.ResponseWriter, r *http.Request) {
 	t, _ := template.ParseFiles("templates/layout.html", "templates/threads.html")
-	t.ExecuteTemplate(w, "layout", nil)
+	t.ExecuteTemplate(w, "layout", nil) // ここにthread構造体を渡してレンダリングする
 }
