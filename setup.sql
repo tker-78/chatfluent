@@ -1,0 +1,39 @@
+DROP TABLE users;
+DROP TABLE sessions;
+DROP TABLE threads;
+DROP TABLE posts;
+
+CREATE TABLE IF NOT EXISTS users (
+  id serial PRIMARY KEY NOT NULL,
+  uuid VARCHAR(64) NOT NULL UNIQUE,
+  name VARCHAR(64) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS sessions (
+  id SERIAL PRIMARY KEY NOT NULL,
+  uuid VARCHAR(64) NOT NULL UNIQUE,
+  email VARCHAR(255) NOT NULL,
+  user_id INTEGER REFERENCES users(id),
+  created_at TIMESTAMP NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS threads (
+  id serial PRIMARY KEY,
+  uuid VARCHAR(64) NOT NULL UNIQUE,
+  topic TEXT,
+  user_id INTEGER REFERENCES users(id),
+  created_at TIMESTAMP NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS posts (
+  id SERIAL PRIMARY KEY,
+  uuid VARCHAR(64) NOT NULL UNIQUE,
+  body TEXT,
+  user_id INTEGER REFERENCES users(id),
+  thread_id INTEGER REFERENCES threads(id),
+  created_at TIMESTAMP NOT NULL
+);
+
