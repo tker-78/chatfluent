@@ -102,7 +102,6 @@ func authenticate(w http.ResponseWriter, r *http.Request) {
 		log.Println(r.Cookie("_cookie"))
 		http.Redirect(w, r, "/", http.StatusFound)
 	} else {
-		log.Println(user)
 		log.Println("ログインできませんでした。")
 		http.Redirect(w, r, "/login", http.StatusFound)
 	}
