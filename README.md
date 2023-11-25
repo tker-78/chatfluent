@@ -81,6 +81,16 @@ homeページの作成
 {{ end }}
 ```
 
+### staticファイルの取り扱い処理
+config.Static = "public"に設定しているので、publicフォルダに静的ファイルを格納し、
+main.goでそれらを読み込む設定をする。  
+
+```go[main.go]
+files := http.FileServer(http.Dir(config.Static))
+mux.Handle("/static/", http.StripPrefix("/static/", files))
+```
+
+
 
 ## ログイン状態の判定
 `route_main.go`に記述する.  

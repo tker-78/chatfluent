@@ -9,6 +9,8 @@ import (
 
 func startServer() {
 	mux := http.NewServeMux()
+	files := http.FileServer(http.Dir(config.Static))
+	mux.Handle("/static/", http.StripPrefix("/static/", files))
 	mux.HandleFunc("/", index)
 
 	server := &http.Server{
@@ -27,11 +29,11 @@ func index(w http.ResponseWriter, r *http.Request) {
 	// fmt.Fprintf(w, "This is the %s page", "xxxx")
 
 	// index.htmlをパースしてテンプレートオブジェクトに変換する
-	t, err := template.ParseFiles("templates/index.html")
+	t, err := template.ParseFiles("templates/layout.html", "templates/index.html", "templates/navbar.html")
 	if err != nil {
 		log.Println(err)
 	}
 
 	// nameがindexのテンプレートに対して、helloの文字列を渡して実行する。
-	t.ExecuteTemplate(w, "index", "hello")
+	t.ExecuteTemplate(w, "layout", "xxx")
 }
