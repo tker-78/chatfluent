@@ -1,8 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
+	"text/template"
 	"time"
 )
 
@@ -23,5 +24,14 @@ func startServer() {
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "This is the %s page", "index")
+	// fmt.Fprintf(w, "This is the %s page", "xxxx")
+
+	// index.htmlをパースしてテンプレートオブジェクトに変換する
+	t, err := template.ParseFiles("templates/index.html")
+	if err != nil {
+		log.Println(err)
+	}
+
+	// nameがindexのテンプレートに対して、helloの文字列を渡して実行する。
+	t.ExecuteTemplate(w, "index", "hello")
 }
