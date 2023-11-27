@@ -19,9 +19,12 @@ type User struct {
 func (user *User) Create() error {
 	cmd := `INSERT INTO users 
 					(uuid, name, email, password, created_at) 
-					VALUES ($1, $2, $3, $4, $5)`
+					VALUES ($1, $2, $3, $4, $5)
+					returning id, uuid, created_at` // オブジェクトに値を返して格納する
 
-	_, err := DbConnection.Exec(cmd, user.Id, createUUID(), user.Name, user.Email, Encrypt(user.Password), time.Now())
+	// _, err := DbConnection.Exec(cmd, createUUID(), user.Name, user.Email, Encrypt(user.Password), time.Now())
+	row := DbConnection.QueryRow(cmd, createUUID(), user.Name, user.Email, Encrypt(user.Password), time.Now())
+	err := row.Scan(&user.Id, &user.Uuid, &user.CreatedAt)
 	return err
 }
 
