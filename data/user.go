@@ -15,7 +15,7 @@ type User struct {
 }
 
 // Create a new user
-// not yet tested
+// tested
 func (user *User) Create() error {
 	cmd := `INSERT INTO users 
 					(uuid, name, email, password, created_at) 
@@ -73,8 +73,16 @@ func (user *User) Update() error {
 	return err
 }
 
+// delete a user
+// tested
+func (user *User) Delete() error {
+	cmd := "DELETE from users WHERE id = $1"
+	_, err := DbConnection.Exec(cmd, user.Id)
+	return err
+}
+
 // Delete a single user given the email
-// not yet tested
+// tested
 func DeleteByEmail(email string) error {
 	cmd := "SELECT id, uuid, name, email, password, created_at FROM users WHERE email = $1"
 	row := DbConnection.QueryRow(cmd, email)

@@ -24,6 +24,20 @@ uuidを生成する関数の定義もここ.
 **Userの作成**  
 `user.go`にuser構造体とsession構造体、それに関連するメソッドを記述する.  
 
+userに関するテストは、`user_test.go`に記述する。
+```go
+func Test_UserCreate(t *testing.T) {
+  setup()
+  if err := users[0].Create(); err != nil {
+    t.Error(err, "Cannot create user.")
+  }
+  if users[0].Id == 0 {
+    t.Errorf("No id or created_at in user")
+  }
+  ...
+}
+```
+
 
 **uuidの生成**  
 `github.com/nu7hatch/gouuid`を参考に実装する。  
