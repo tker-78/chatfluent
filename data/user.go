@@ -41,7 +41,7 @@ func UserByEmail(email string) (user User, err error) {
 }
 
 // Get all users from database
-// not yet tested
+// tested
 func Users() ([]User, error) {
 	cmd := "SELECT id, uuid, name, email, password, created_at FROM users"
 	rows, err := DbConnection.Query(cmd)
@@ -63,7 +63,7 @@ func Users() ([]User, error) {
 
 // Update user information in the database
 // userの更新を保存する
-// not yet tested
+// tested
 func (user *User) Update() error {
 	cmd := "UPDATE users set name= $2, email = $3 WHERE id = $1"
 	_, err := DbConnection.Exec(cmd, user.Id, user.Name, user.Email)

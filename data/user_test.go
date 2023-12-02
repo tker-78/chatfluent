@@ -2,7 +2,6 @@ package data
 
 import (
 	"database/sql"
-	_ "database/sql"
 	"testing"
 )
 
@@ -74,5 +73,38 @@ func Test_Users(t *testing.T) {
 	}
 	if us[0].Email != users[0].Email {
 		t.Error(us[0], users[0], "wrong user retrieved")
+	}
+}
+
+func Test_UserUpdate(t *testing.T) {
+	// todo:
+	setup()
+	if err := users[0].Create(); err != nil {
+		t.Error(err, "cannot create user")
+	}
+
+	users[0].Name = "updatedUser"
+
+	if err := users[0].Update(); err != nil {
+		t.Error(err, "cannot update user")
+	}
+
+	u, err := UserByEmail(users[0].Email)
+	if err != nil {
+		t.Error(err, "cannot find the user")
+	}
+	if u.Name != "updatedUser" {
+		t.Error(err, "user not updated")
+	}
+
+}
+
+func Test_UserDeleteAll(t *testing.T) {
+	setup()
+	if err := users[0].Create(); err != nil {
+		t.Error(err, "cannot create user")
+	}
+	if err := DeleteAllUsers(); err != nil {
+		t.Error(err, "cannot delete all users")
 	}
 }
