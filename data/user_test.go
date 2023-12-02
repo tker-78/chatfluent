@@ -108,3 +108,56 @@ func Test_UserDeleteAll(t *testing.T) {
 		t.Error(err, "cannot delete all users")
 	}
 }
+
+func Test_SessionCreate(t *testing.T) {
+	setup()
+	if err := users[0].Create(); err != nil {
+		t.Error(err, "cannot create user")
+	}
+	session, err := users[0].SessionCreate()
+	if err != nil {
+		t.Error(err, "cannot create session")
+	}
+	if session.UserId != users[0].Id {
+		t.Error(err, "User not linked with session")
+	}
+}
+
+func Test_GetSession(t *testing.T) {
+	setup()
+	if err := users[0].Create(); err != nil {
+		t.Error(err, "cannot create user")
+	}
+	session, err := users[0].SessionCreate()
+	if err != nil {
+		t.Error(err, "cannot create session")
+	}
+	sess, err := users[0].Session()
+	if err != nil {
+		t.Error(err, "cannot get session")
+	}
+	if sess.Id != session.Id {
+		t.Error(err, "cannot get correct user's session")
+	}
+}
+
+func Test_DeleteSession(t *testing.T) {
+	setup()
+	if err := users[0].Create(); err != nil {
+		t.Error(err, "cannot create user")
+	}
+	_, err := users[0].SessionCreate()
+	if err != nil {
+		t.Error(err, "cannot create session")
+	}
+
+	if err = users[0].SessionDelete(); err != nil {
+		t.Error(err, "cannot delete session")
+	}
+
+	_, err = users[0].Session()
+	if err != sql.ErrNoRows {
+		t.Error(err, "session not deleted")
+	}
+
+}

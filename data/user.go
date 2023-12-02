@@ -14,6 +14,14 @@ type User struct {
 	CreatedAt time.Time
 }
 
+type Session struct {
+	Id        int
+	Uuid      string
+	Email     string
+	UserId    int
+	CreatedAt time.Time
+}
+
 // Create a new user
 // tested
 func (user *User) Create() error {
@@ -103,4 +111,56 @@ func DeleteAllUsers() error {
 	cmd := "DELETE FROM users"
 	_, err := DbConnection.Exec(cmd)
 	return err
+}
+
+// Session create
+// tested
+func (user *User) SessionCreate() (Session, error) {
+	cmd := `
+				INSERT INTO sessions (uuid, email, user_id, created_at) 
+				VALUES ($1, $2, $3, $4) 
+				returning id, uuid, email, user_id, created_at
+				`
+	row := DbConnection.QueryRow(cmd, createUUID(), user.Email, user.Id, time.Now())
+	session := Session{}
+	err := row.Scan(&session.Id, &session.Uuid, &session.Email, &session.UserId, &session.CreatedAt)
+	if err != nil {
+		log.Println(err)
+		return Session{}, err
+	}
+
+	return session, nil
+}
+
+// sessionの取得
+// tested
+func (user *User) Session() (Session, error) {
+	cmd := "SELECT id, uuid, email, user_id, created_at FROM sessions WHERE user_id = $1"
+	session := Session{}
+	row := DbConnection.QueryRow(cmd, user.Id)
+	err := row.Scan(&session.Id, &session.Uuid, &session.Email, &session.UserId, &session.CreatedAt)
+	if err != nil {
+		log.Println(err, "cannot get session")
+	}
+	return session, err
+}
+
+// sessionの削除
+// tested
+func (user *User) SessionDelete() error {
+	cmd := "DELETE FROM sessions WHERE user_id = $1"
+	_, err := DbConnection.Exec(cmd, user.Id)
+	if err != nil {
+		log.Println(err, "cannot delete session")
+	}
+	return err
+}
+
+func DeleteAllSessions() error {
+	cmd := "DELETE from sessions"
+	if _, err := DbConnection.Exec(cmd); err != nil {
+		log.Fatalln(err, "cannot delete sessions")
+		return err
+	}
+	return nil
 }
