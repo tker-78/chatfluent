@@ -16,6 +16,7 @@ func startServer() {
 	mux.HandleFunc("/", index)
 
 	mux.HandleFunc("/login", login)
+	mux.HandleFunc("/authenticate", authenticate)
 	mux.HandleFunc("/signup", signup)
 	mux.HandleFunc("/signup_account", signupAccount)
 
@@ -55,6 +56,33 @@ func login(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 	t.ExecuteTemplate(w, "layout", nil)
+}
+
+func authenticate(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		log.Println(err)
+	}
+	user, err := data.UserByEmail(r.PostFormValue("email"))
+	if err != nil {
+		log.Println(err, "cannot find user")
+	}
+	if user.Password == data.Encrypt(r.PostFormValue("password")) {
+		session, err := user.SessionCreate()
+		if err != nil {
+			log.Println(err, "cannot create session")
+		}
+		cookie := http.Cookie{
+			Name:     "_cookie",
+			Value:    session.Uuid,
+			HttpOnly: true,
+		}
+		http.SetCookie(w, &cookie)
+		http.Redirect(w, r, "/", http.StatusFound)
+		log.Println("login successful.")
+	} else {
+		http.Redirect(w, r, "/login", http.StatusFound)
+	}
 }
 
 // userの新規登録
