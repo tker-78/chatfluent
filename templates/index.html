@@ -1,6 +1,21 @@
 {{ define "content" }}
 <body>
-  <h1>This is the {{ . }} page.</h1>
+  <h2> All users</h2>
+
+  <table class="" style="width: 50%; ">
+    <tr>
+      <th>id</th>
+      <th>name</th>
+      <th>email</th>
+    </tr>
+    {{ range .}}
+    <tr>
+      <td>{{ .Id}}</td>
+      <td>{{ .Name }}</td>
+      <td>{{ .Email}}</td>
+    </tr>
+    {{ end }}
+  </table>
   
 </body>
 {{ end }}

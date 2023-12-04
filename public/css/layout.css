@@ -1,3 +1,16 @@
 .container {
-  color: red;
+  color: green;
+}
+
+.navbar-brand {
+  color: black;
+  text-decoration: none;
+}
+
+.navbar {
+  text-decoration: none;
+}
+
+.navbar-right {
+  text-decoration: none;
 }
