@@ -2,10 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"os"
 	"strings"
+
+	"example.com/tker-78/chatfluent/data"
 )
 
 /*
@@ -62,8 +65,16 @@ func error_message(w http.ResponseWriter, r *http.Request, msg string) {
 }
 
 // session
-func session(w http.ResponseWriter, r *http.Request) {
-	// todo:
+func session(w http.ResponseWriter, r *http.Request) (data.Session, error) {
+	cookie, err := r.Cookie("_cookie")
+	if err == nil {
+		sess := data.Session{Uuid: cookie.Value}
+		if ok, _ := sess.Check(); !ok {
+			err = errors.New("invalid session")
+		}
+	}
+	return data.Session{}, err
+
 }
 
 // HTMLの生成

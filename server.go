@@ -13,12 +13,15 @@ func startServer() {
 	mux := http.NewServeMux()
 	files := http.FileServer(http.Dir(config.Static))
 	mux.Handle("/static/", http.StripPrefix("/static/", files))
+
+	mux.HandleFunc("/top", top)
 	mux.HandleFunc("/", index)
 
 	mux.HandleFunc("/login", login)
 	mux.HandleFunc("/authenticate", authenticate)
 	mux.HandleFunc("/signup", signup)
 	mux.HandleFunc("/signup_account", signupAccount)
+	mux.HandleFunc("/logout", logout)
 
 	server := &http.Server{
 		Addr:           config.Address,
@@ -32,11 +35,29 @@ func startServer() {
 
 }
 
+func top(w http.ResponseWriter, r *http.Request) {
+	// loginしている場合は、indexページにリダイレクトする
+	if _, err := session(w, r); err == nil {
+		http.Redirect(w, r, "/", http.StatusFound)
+		log.Println("redirected to index page.")
+	}
+	t, err := template.ParseFiles("templates/layout.html", "templates/public.navbar.html", "templates/top.html")
+	if err != nil {
+		log.Println(err)
+	}
+	t.ExecuteTemplate(w, "layout", nil)
+}
+
 func index(w http.ResponseWriter, r *http.Request) {
-	// fmt.Fprintf(w, "This is the %s page", "xxxx")
+	// loginしていない場合は、topページにリダイレクトする。
+	_, err := session(w, r)
+	if err != nil {
+		http.Redirect(w, r, "/top", http.StatusFound)
+		log.Println("redirected to top page.")
+	}
 
 	// index.htmlをパースしてテンプレートオブジェクトに変換する
-	t, err := template.ParseFiles("templates/layout.html", "templates/index.html", "templates/navbar.html")
+	t, err := template.ParseFiles("templates/layout.html", "templates/index.html", "templates/private.navbar.html")
 	if err != nil {
 		log.Println(err)
 	}
@@ -51,7 +72,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
-	t, err := template.ParseFiles("templates/layout.html", "templates/navbar.html", "templates/login.html")
+	t, err := template.ParseFiles("templates/layout.html", "templates/public.navbar.html", "templates/login.html")
 	if err != nil {
 		log.Println(err)
 	}
@@ -88,7 +109,7 @@ func authenticate(w http.ResponseWriter, r *http.Request) {
 // userの新規登録
 // GET
 func signup(w http.ResponseWriter, r *http.Request) {
-	t, err := template.ParseFiles("templates/layout.html", "templates/navbar.html", "templates/signup.html")
+	t, err := template.ParseFiles("templates/layout.html", "templates/public.navbar.html", "templates/signup.html")
 	if err != nil {
 		log.Println(err)
 	}
@@ -111,4 +132,15 @@ func signupAccount(w http.ResponseWriter, r *http.Request) {
 	}
 	http.Redirect(w, r, "/login", http.StatusFound)
 	log.Println("signup successful, please login.")
+}
+
+// logout
+func logout(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("_cookie")
+	if err != http.ErrNoCookie {
+		log.Println(err)
+		session := data.Session{Uuid: cookie.Value}
+		session.DeleteByUuid()
+	}
+	http.Redirect(w, r, "/top", http.StatusFound)
 }

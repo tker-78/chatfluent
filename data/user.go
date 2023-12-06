@@ -164,3 +164,27 @@ func DeleteAllSessions() error {
 	}
 	return nil
 }
+
+// sessionが有効かチェックする
+func (session *Session) Check() (valid bool, err error) {
+	cmd := "SELECT id, uuid, email, user_id, created_at FROM sessions WHERE uuid = $1"
+	row := DbConnection.QueryRow(cmd, session.Uuid)
+	err = row.Scan(&session.Id, &session.Uuid, &session.Email, &session.UserId, &session.CreatedAt)
+	if err != nil {
+		valid = false
+		return
+	}
+	if session.Id != 0 {
+		valid = true
+	}
+	return
+}
+
+func (session *Session) DeleteByUuid() error {
+	cmd := "DELETE FROM sessions WHERE uuid = $1"
+	_, err := DbConnection.Exec(cmd, session.Uuid)
+	if err != nil {
+		log.Println(err)
+	}
+	return err
+}
