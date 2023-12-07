@@ -55,6 +55,20 @@ func (user *User) CreatePost(th Thread, body string) (Post, error) {
 }
 
 // Get all threads in the database
+func Threads() ([]Thread, error) {
+	threads := []Thread{}
+	rows, err := DbConnection.Query("SELECT * FROM threads")
+	if err != nil {
+		log.Println(err)
+		return threads, err
+	}
+	for rows.Next() {
+		var thread Thread
+		rows.Scan(&thread.Id, &thread.Uuid, &thread.Topic, &thread.UserId, &thread.CreatedAt)
+		threads = append(threads, thread)
+	}
+	return threads, err
+}
 
 // delete all threads
 func DeleteAllThreads() error {

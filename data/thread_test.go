@@ -37,3 +37,27 @@ func Test_CreatePost(t *testing.T) {
 	}
 
 }
+
+func Test_Threads(t *testing.T) {
+	setup()
+	if err := users[0].Create(); err != nil {
+		t.Error(err, "cannot create user.")
+	}
+	_, err := users[0].CreateThread("a new thread")
+	if err != nil {
+		t.Error(err, "cannot create thread")
+	}
+	_, err = users[0].CreateThread("a new thread")
+	if err != nil {
+		t.Error(err, "cannot create thread")
+	}
+
+	threads, err := Threads()
+	if err != nil {
+		t.Error(err, "cannot get threads")
+	}
+	if len(threads) != 2 {
+		t.Error(err, "cannot get threads correctly")
+	}
+
+}
