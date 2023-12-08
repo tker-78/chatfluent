@@ -22,6 +22,10 @@ type Post struct {
 	CreatedAt time.Time
 }
 
+func (thread *Thread) CreatedAtDate() string {
+	return thread.CreatedAt.Format(time.RFC3339)
+}
+
 // Create a new thread
 func (user *User) CreateThread(topic string) (Thread, error) {
 	cmd := `INSERT INTO threads (uuid, topic, user_id, created_at) 
@@ -70,6 +74,13 @@ func Threads() ([]Thread, error) {
 	return threads, err
 }
 
+func ThreadByUuid(uuid string) (thread Thread, err error) {
+	cmd := "SELECT id, uuid, topic, user_id, created_at FROM threads WHERE uuid = $1"
+	thread = Thread{}
+	err = DbConnection.QueryRow(cmd, uuid).Scan(&thread.Id, &thread.Uuid, &thread.Topic, &thread.UserId, &thread.CreatedAt)
+	return
+}
+
 // delete all threads
 func DeleteAllThreads() error {
 	cmd := "DELETE FROM threads"
@@ -79,6 +90,14 @@ func DeleteAllThreads() error {
 		return err
 	}
 	return err
+}
+
+// threadのUserを返す
+func (thread *Thread) User() (user User) {
+	cmd := "SELECT id, uuid, name, email, created_at FROM users WHERE id = $1"
+	user = User{}
+	DbConnection.QueryRow(cmd, thread.UserId).Scan(&user.Id, &user.Uuid, &user.Name, &user.Email, &user.CreatedAt)
+	return
 }
 
 // delete all posts

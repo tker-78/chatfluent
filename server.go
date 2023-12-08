@@ -22,6 +22,7 @@ func startServer() {
 	mux.HandleFunc("/signup", signup)
 	mux.HandleFunc("/signup_account", signupAccount)
 	mux.HandleFunc("/logout", logout)
+	mux.HandleFunc("/thread/read", threadRead)
 
 	server := &http.Server{
 		Addr:           config.Address,
@@ -62,13 +63,10 @@ func index(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 
-	users, err := data.Users()
-	if err != nil {
-		log.Println(err)
-	}
+	threads, err := data.Threads()
 
 	// nameがindexのテンプレートに対して、helloの文字列を渡して実行する。
-	t.ExecuteTemplate(w, "layout", users)
+	t.ExecuteTemplate(w, "layout", threads)
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
@@ -143,4 +141,29 @@ func logout(w http.ResponseWriter, r *http.Request) {
 		session.DeleteByUuid()
 	}
 	http.Redirect(w, r, "/top", http.StatusFound)
+}
+
+// threadRead
+func threadRead(w http.ResponseWriter, r *http.Request) {
+	vals := r.URL.Query()
+	uuid := vals.Get("id")
+	thread, err := data.ThreadByUuid(uuid)
+	if err != nil {
+		log.Println(err)
+	}
+	_, err = session(w, r)
+	if err != nil {
+		t, err := template.ParseFiles("templates/layout.html", "templates/public.navbar.html", "templates/public.thread.html")
+		if err != nil {
+			log.Println(err)
+		}
+		t.ExecuteTemplate(w, "layout", thread)
+	} else {
+		t, err := template.ParseFiles("templates/layout.html", "templates/private.navbar.html", "templates/private.thread.html")
+		if err != nil {
+			log.Println(err)
+		}
+		t.ExecuteTemplate(w, "layout", thread)
+	}
+
 }

@@ -1,21 +1,18 @@
 {{ define "content" }}
 <body>
-  <h2> All users</h2>
-
-  <table class="table" >
-    <tr>
-      <th>id</th>
-      <th>name</th>
-      <th>email</th>
-    </tr>
-    {{ range .}}
-    <tr>
-      <td>{{ .Id}}</td>
-      <td>{{ .Name }}</td>
-      <td>{{ .Email}}</td>
-    </tr>
-    {{ end }}
-  </table>
+  {{ range . }}
+    <div class="container">
+      <div class="panel-heading">
+        <span class="lead">{{ .Topic }}</span>
+      </div>
+      <div class="panel-body">
+        開始ユーザー: {{ .User.Name }} - 開始日: {{ .CreatedAtDate }} 
+        <div class="pull-right">
+          <a href="/thread/read?id={{.Uuid}}">もっと読む</a>
+        </div>
+      </div>
+    </div>
+  {{ end }}
   
 </body>
 {{ end }}
