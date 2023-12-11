@@ -23,6 +23,8 @@ func startServer() {
 	mux.HandleFunc("/signup_account", signupAccount)
 	mux.HandleFunc("/logout", logout)
 	mux.HandleFunc("/thread/read", threadRead)
+	mux.HandleFunc("/thread/new", threadNew)
+	mux.HandleFunc("/thread/create", threadCreate)
 
 	server := &http.Server{
 		Addr:           config.Address,
@@ -165,5 +167,38 @@ func threadRead(w http.ResponseWriter, r *http.Request) {
 		}
 		t.ExecuteTemplate(w, "layout", thread)
 	}
+
+}
+
+// threadNew
+func threadNew(w http.ResponseWriter, r *http.Request) {
+	// loginユーザーのみが新規スレッドを作成できる
+	_, err := session(w, r)
+	if err != nil {
+		http.Redirect(w, r, "/login", http.StatusFound)
+	} else {
+		t, err := template.ParseFiles("templates/layout.html", "templates/private.navbar.html", "templates/new.thread.html")
+		if err != nil {
+			log.Println(err)
+		}
+		t.ExecuteTemplate(w, "layout", nil)
+	}
+
+}
+
+func threadCreate(w http.ResponseWriter, r *http.Request) {
+	sess, err := session(w, r)
+	if err != nil {
+		http.Redirect(w, r, "/login", http.StatusFound)
+	}
+	user, err := sess.User()
+	if err != nil {
+		log.Println(err)
+	}
+	topic := r.PostFormValue("topic")
+	if _, err := user.CreateThread(topic); err != nil {
+		log.Println(err)
+	}
+	http.Redirect(w, r, "/", http.StatusFound)
 
 }

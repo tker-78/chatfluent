@@ -1,0 +1,9 @@
+{{ define "content" }}
+  <p>this is new thread page.</p>
+  <form action="/thread/create" method="post">
+    <div class="container">
+      <input type="text" name="topic" class="form-control" placeholder="topic">
+      <button type="submit" class="btn btn-primary">登録</button>
+    </div>
+  </form>
+{{ end }}

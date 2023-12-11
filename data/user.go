@@ -188,3 +188,14 @@ func (session *Session) DeleteByUuid() error {
 	}
 	return err
 }
+
+func (session *Session) User() (User, error) {
+	user := User{}
+	err := DbConnection.QueryRow("SELECT id, uuid, name, email, created_at FROM users WHERE id = $1", session.UserId).
+		Scan(&user.Id, &user.Uuid, &user.Name, &user.Email, &user.CreatedAt)
+	if err != nil {
+		log.Println(err, "cannot find the user")
+	}
+	return user, err
+
+}

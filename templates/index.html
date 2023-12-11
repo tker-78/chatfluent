@@ -1,7 +1,11 @@
 {{ define "content" }}
 <body>
+  <div class="container">
+    <a href="/thread/new">新しいスレッドを始める</a>
+  </div>
+
   {{ range . }}
-    <div class="container">
+    <div class="panel panel-default">
       <div class="panel-heading">
         <span class="lead">{{ .Topic }}</span>
       </div>
@@ -13,6 +17,6 @@
       </div>
     </div>
   {{ end }}
-  
+
 </body>
 {{ end }}

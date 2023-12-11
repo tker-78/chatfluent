@@ -33,8 +33,8 @@ func (user *User) CreateThread(topic string) (Thread, error) {
 					returning id, uuid, topic, user_id, created_at`
 
 	th := Thread{}
-	row := DbConnection.QueryRow(cmd, createUUID(), topic, user.Id, time.Now())
-	err := row.Scan(&th.Id, &th.Uuid, &th.Topic, &th.UserId, &th.CreatedAt)
+	err := DbConnection.QueryRow(cmd, createUUID(), topic, user.Id, time.Now()).
+		Scan(&th.Id, &th.Uuid, &th.Topic, &th.UserId, &th.CreatedAt)
 	if err != nil {
 		log.Println(err)
 		return th, err
