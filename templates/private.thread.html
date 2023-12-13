@@ -1,4 +1,35 @@
 {{ define "content" }}
-  <p>これはprivate threadのページです</p>
-  {{ .Topic }}
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <span class="lead">{{ .Topic }}</span>
+      <div class="pull-right">
+        開始ユーザー {{ .User.Name }} - 開始日時 {{ .CreatedAtDate }}
+      </div>
+    </div>
+  </div>
+
+  {{ range .Posts }}
+    <div class="panel-body">
+      <span class="lead">{{ .Body }}</span>
+      <div class="pull-right">
+        {{ .User.Name }} - {{ .CreatedAtDate }}
+      </div>
+    </div>
+  {{ end }}
+
+  <div class="panel panel-info">
+    <div class="panel-body">
+      <form action="/thread/post" method="post" role="form">
+        <div class="form-group">
+          <textarea name="body" class="form-control" id="body" placeholder="ここに返信を書いてください" rows="3"></textarea>
+          <input type="hidden" name="uuid" value="{{.Uuid}}">
+          <button class="btn btn-primary" type="submit">返信</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+
+
 {{ end }}

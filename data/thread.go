@@ -26,6 +26,10 @@ func (thread *Thread) CreatedAtDate() string {
 	return thread.CreatedAt.Format(time.RFC3339)
 }
 
+func (post *Post) CreatedAtDate() string {
+	return post.CreatedAt.Format(time.RFC3339)
+}
+
 // Create a new thread
 func (user *User) CreateThread(topic string) (Thread, error) {
 	cmd := `INSERT INTO threads (uuid, topic, user_id, created_at) 
@@ -93,11 +97,36 @@ func DeleteAllThreads() error {
 }
 
 // threadのUserを返す
-func (thread *Thread) User() (user User) {
+func (thread *Thread) User() (user *User) {
 	cmd := "SELECT id, uuid, name, email, created_at FROM users WHERE id = $1"
-	user = User{}
+	user = new(User)
 	DbConnection.QueryRow(cmd, thread.UserId).Scan(&user.Id, &user.Uuid, &user.Name, &user.Email, &user.CreatedAt)
 	return
+}
+
+// postのUserを返す
+func (post *Post) User() (user *User) {
+	cmd := "SELECT id, uuid, name, email, created_at FROM users WHERE id = $1"
+	user = new(User)
+	DbConnection.QueryRow(cmd, post.UserId).Scan(&user.Id, &user.Uuid, &user.Name, &user.Email, &user.CreatedAt)
+	return
+}
+
+// threadに属する全てのPostを返す
+func (thread *Thread) Posts() ([]Post, error) {
+	cmd := "SELECT id, uuid, body, user_id, thread_id, created_at FROM posts WHERE thread_id = $1"
+	posts := []Post{}
+	rows, err := DbConnection.Query(cmd, thread.Id)
+	if err != nil {
+		log.Println(err, "cannot get query for posts")
+	}
+	defer rows.Close()
+	for rows.Next() {
+		post := Post{}
+		rows.Scan(&post.Id, &post.Uuid, &post.Body, &post.UserId, &post.ThreadId, &post.CreatedAt)
+		posts = append(posts, post)
+	}
+	return posts, err
 }
 
 // delete all posts

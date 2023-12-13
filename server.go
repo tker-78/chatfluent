@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"text/template"
@@ -25,6 +26,7 @@ func startServer() {
 	mux.HandleFunc("/thread/read", threadRead)
 	mux.HandleFunc("/thread/new", threadNew)
 	mux.HandleFunc("/thread/create", threadCreate)
+	mux.HandleFunc("/thread/post", threadPost)
 
 	server := &http.Server{
 		Addr:           config.Address,
@@ -149,7 +151,7 @@ func logout(w http.ResponseWriter, r *http.Request) {
 func threadRead(w http.ResponseWriter, r *http.Request) {
 	vals := r.URL.Query()
 	uuid := vals.Get("id")
-	thread, err := data.ThreadByUuid(uuid)
+	th, err := data.ThreadByUuid(uuid)
 	if err != nil {
 		log.Println(err)
 	}
@@ -159,13 +161,13 @@ func threadRead(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println(err)
 		}
-		t.ExecuteTemplate(w, "layout", thread)
+		t.ExecuteTemplate(w, "layout", &th)
 	} else {
-		t, err := template.ParseFiles("templates/layout.html", "templates/private.navbar.html", "templates/private.thread.html")
+		t, err := template.ParseFiles("templates/layout.html", "templates/private.thread.html", "templates/private.navbar.html")
 		if err != nil {
 			log.Println(err)
 		}
-		t.ExecuteTemplate(w, "layout", thread)
+		t.ExecuteTemplate(w, "layout", &th)
 	}
 
 }
@@ -200,5 +202,33 @@ func threadCreate(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 	http.Redirect(w, r, "/", http.StatusFound)
+
+}
+
+func threadPost(w http.ResponseWriter, r *http.Request) {
+	sess, err := session(w, r)
+	if err != nil {
+		http.Redirect(w, r, "/login", http.StatusFound)
+	}
+	user, err := sess.User()
+	if err != nil {
+		log.Println(err, "cannot find user")
+	}
+
+	body := r.PostFormValue("body")
+	uuid := r.PostFormValue("uuid")
+
+	thread, err := data.ThreadByUuid(uuid)
+	if err != nil {
+		log.Println(err, "incorrect uuid")
+		http.Redirect(w, r, "/", http.StatusFound)
+	}
+
+	if _, err := user.CreatePost(thread, body); err != nil {
+		log.Println(err, "cannot create a post")
+	} else {
+		url := fmt.Sprintf("/thread/read?id=%s", uuid)
+		http.Redirect(w, r, url, http.StatusFound)
+	}
 
 }
