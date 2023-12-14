@@ -31,14 +31,19 @@ func (post *Post) CreatedAtDate() string {
 }
 
 // Create a new thread
-func (user *User) CreateThread(topic string) (Thread, error) {
+func (user *User) CreateThread(topic string) (th Thread, err error) {
+	if topic == "" {
+		log.Println("topic should not be empty")
+		return
+	}
 	cmd := `INSERT INTO threads (uuid, topic, user_id, created_at) 
 					VALUES ($1, $2, $3, $4)
 					returning id, uuid, topic, user_id, created_at`
 
-	th := Thread{}
-	err := DbConnection.QueryRow(cmd, createUUID(), topic, user.Id, time.Now()).
+	th = Thread{}
+	err = DbConnection.QueryRow(cmd, createUUID(), topic, user.Id, time.Now()).
 		Scan(&th.Id, &th.Uuid, &th.Topic, &th.UserId, &th.CreatedAt)
+
 	if err != nil {
 		log.Println(err)
 		return th, err
@@ -47,14 +52,18 @@ func (user *User) CreateThread(topic string) (Thread, error) {
 }
 
 // Create a new post to a thread
-func (user *User) CreatePost(th Thread, body string) (Post, error) {
+func (user *User) CreatePost(th Thread, body string) (post Post, err error) {
+	if body == "" {
+		log.Println("post body should not be empty.")
+		return
+	}
 	cmd := `INSERT INTO posts (uuid, body, user_id, thread_id, created_at)
 					VALUES ($1, $2, $3, $4, $5)
 					returning id, uuid, body, user_id, thread_id, created_at
 					`
 	row := DbConnection.QueryRow(cmd, createUUID(), body, user.Id, th.Id, time.Now())
-	post := Post{}
-	err := row.Scan(&post.Id, &post.Uuid, &post.Body, &post.UserId, &post.ThreadId, &post.CreatedAt)
+	post = Post{}
+	err = row.Scan(&post.Id, &post.Uuid, &post.Body, &post.UserId, &post.ThreadId, &post.CreatedAt)
 	if err != nil {
 		log.Println(err)
 		return post, err
