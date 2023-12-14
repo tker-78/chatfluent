@@ -29,7 +29,7 @@
     <div class="panel-body">
       <form action="/thread/post" method="post" role="form">
         <div class="form-group">
-          <textarea name="body" class="form-control" id="body" placeholder="ここに返信を書いてください" rows="3"></textarea>
+          <textarea name="body" class="form-control" id="body" placeholder="ここに返信を書いてください" rows="3" required></textarea>
           <input type="hidden" name="uuid" value="{{.Uuid}}">
           <button class="btn btn-primary" type="submit">返信</button>
         </div>
