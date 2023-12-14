@@ -23,11 +23,11 @@ type Post struct {
 }
 
 func (thread *Thread) CreatedAtDate() string {
-	return thread.CreatedAt.Format(time.RFC3339)
+	return thread.CreatedAt.Format("2006年01月02日 03:04pm")
 }
 
 func (post *Post) CreatedAtDate() string {
-	return post.CreatedAt.Format(time.RFC3339)
+	return post.CreatedAt.Format("2006年01月02日 03:04pm")
 }
 
 // Create a new thread
