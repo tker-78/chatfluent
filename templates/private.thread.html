@@ -6,12 +6,19 @@
         開始ユーザー {{ .User.Name }} - 開始日時 {{ .CreatedAtDate }}
       </div>
     </div>
+    {{ $uuid := .Uuid }}
 
   {{ range .Posts }}
     <div class="panel-body">
       <span class="lead">{{ .Body }}</span>
       <div class="pull-right">
         {{ .User.Name }} - {{ .CreatedAtDate }}
+        <form action="/post/delete" method="post" class="pull-right">
+          <input type="hidden" name="_method" value="delete">
+          <input type="hidden" name="uuid" value="{{.Uuid}}">
+          <input type="hidden" name="tuuid" value="{{$uuid}}">
+          <button class="btn btn-danger" type="submit">delete</button>
+        </form>
       </div>
     </div>
   {{ end }}
@@ -28,6 +35,14 @@
         </div>
       </form>
     </div>
+  </div>
+
+  <div class="container delete-section">
+    <form action="/thread/delete" method="post">
+      <input type="hidden" name="uuid" value="{{.Uuid}}">
+      <input type="hidden" name="_method" value="delete">
+      <button type="submit" class="btn btn-danger">このThreadを削除</button>
+    </form>
   </div>
 
 

@@ -27,6 +27,8 @@ func startServer() {
 	mux.HandleFunc("/thread/new", threadNew)
 	mux.HandleFunc("/thread/create", threadCreate)
 	mux.HandleFunc("/thread/post", threadPost)
+	mux.HandleFunc("/thread/delete", threadDelete)
+	mux.HandleFunc("/post/delete", postDelete)
 
 	server := &http.Server{
 		Addr:           config.Address,
@@ -75,7 +77,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
-	t, err := template.ParseFiles("templates/layout.html", "templates/public.navbar.html", "templates/login.html")
+	t, err := template.ParseFiles("templates/login.layout.html", "templates/public.navbar.html", "templates/login.html")
 	if err != nil {
 		log.Println(err)
 	}
@@ -232,4 +234,33 @@ func threadPost(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, url, http.StatusFound)
 	}
 
+}
+
+func threadDelete(w http.ResponseWriter, r *http.Request) {
+	uuid := r.PostFormValue("uuid")
+	thread, err := data.ThreadByUuid(uuid)
+	if err != nil {
+		log.Println(err)
+	}
+	err = thread.Delete()
+	if err != nil {
+		log.Println(err)
+	}
+	http.Redirect(w, r, "/", http.StatusFound)
+
+}
+
+func postDelete(w http.ResponseWriter, r *http.Request) {
+	uuid := r.PostFormValue("uuid")
+	tuuid := r.PostFormValue("tuuid")
+	post, err := data.PostByUuid(uuid)
+	if err != nil {
+		log.Println(err)
+	}
+	err = post.Delete()
+	if err != nil {
+		log.Println(err)
+	}
+	url := fmt.Sprintf("/thread/read?id=%s", tuuid)
+	http.Redirect(w, r, url, http.StatusFound)
 }

@@ -85,6 +85,13 @@ func ThreadByUuid(uuid string) (thread Thread, err error) {
 	return
 }
 
+func PostByUuid(uuid string) (post Post, err error) {
+	cmd := "SELECT id, uuid, body, user_id, thread_id, created_at FROM posts WHERE uuid = $1"
+	post = Post{}
+	err = DbConnection.QueryRow(cmd, uuid).Scan(&post.Id, &post.Uuid, &post.Body, &post.UserId, &post.ThreadId, &post.CreatedAt)
+	return
+}
+
 // delete all threads
 func DeleteAllThreads() error {
 	cmd := "DELETE FROM threads"
@@ -127,6 +134,17 @@ func (thread *Thread) Posts() ([]Post, error) {
 		posts = append(posts, post)
 	}
 	return posts, err
+}
+
+// delete thread
+func (thread *Thread) Delete() error {
+	_, err := DbConnection.Exec("DELETE FROM threads WHERE id = $1", thread.Id)
+	return err
+}
+
+func (post *Post) Delete() error {
+	_, err := DbConnection.Exec("DELETE FROM posts WHERE id = $1", post.Id)
+	return err
 }
 
 // delete all posts

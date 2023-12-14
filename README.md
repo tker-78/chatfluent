@@ -153,7 +153,21 @@ func threadRead(w http.ResponseWriter, r *http.Request) {
   th, err := data.ThreadByUuid(uuid)
   t.ExecuteTemplate(w, "layout", &th)
 }
+```
 
+## Delete メソッドの実装
+formは`method="delete"`をサポートしていないので、
+下記のようにformを実装する。
+
+```html
+  <div class="container delete-section">
+    <form action="/thread/delete" method="post">
+      <input type="hidden" name="uuid" value="{{.Uuid}}">
+      <input type="hidden" name="_method" value="delete">
+      <button type="submit" class="btn btn-danger">このThreadを削除</button>
+    </form>
+  </div>
+```
 
 
 
