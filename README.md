@@ -143,6 +143,16 @@ func session(w http.ResponseWriter, r *http.Request) (data.Session, error) {
 ```
 
 
+## templateからの構造体のメソッド呼び出し
+例えば、`thread.User()`というメソッドをtemplateから呼び出したい場合、
+HandlerFuncには構造体のアドレスを渡す必要がある。
+
+```go
+func threadRead(w http.ResponseWriter, r *http.Request) {
+  ...中略...
+  th, err := data.ThreadByUuid(uuid)
+  t.ExecuteTemplate(w, "layout", &th)
+}
 
 
 

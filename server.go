@@ -45,12 +45,13 @@ func top(w http.ResponseWriter, r *http.Request) {
 	if _, err := session(w, r); err == nil {
 		http.Redirect(w, r, "/", http.StatusFound)
 		log.Println("redirected to index page.")
+	} else {
+		t, err := template.ParseFiles("templates/layout.html", "templates/public.navbar.html", "templates/top.html")
+		if err != nil {
+			log.Println(err)
+		}
+		t.ExecuteTemplate(w, "layout", nil)
 	}
-	t, err := template.ParseFiles("templates/layout.html", "templates/public.navbar.html", "templates/top.html")
-	if err != nil {
-		log.Println(err)
-	}
-	t.ExecuteTemplate(w, "layout", nil)
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
