@@ -170,5 +170,21 @@ formは`method="delete"`をサポートしていないので、
 ```
 
 
+## デプロイ
+
+Goodle App Engineを使う。(goと相性が良さそうなので。)
+
+Compute Engine APIを有効にして、Cloud SQLからPostgresSQLインスタンスを作成する。
+
+
+```bash
+$ gcloud componets install app-engine-go
+```
+
+app.yamlを作成する.
+[ドキュメント](https://cloud.google.com/appengine/docs/standard/go/building-app?hl=ja)
+
+
+
 
 
