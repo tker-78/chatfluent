@@ -172,17 +172,105 @@ formは`method="delete"`をサポートしていないので、
 
 ## デプロイ
 
-Goodle App Engineを使う。(goと相性が良さそうなので。)
+Goodle Cloud Runを使う。(App Engineとの接続がうまくできなかったので、Cloud Runで。)
 
-Compute Engine APIを有効にして、Cloud SQLからPostgresSQLインスタンスを作成する。
+[ここ](https://github.com/tker-78/cloudrun-sample)の手順でアプリケーションを作成.  
 
 
-```bash
-$ gcloud componets install app-engine-go
+base.goに`cloud.google.com/go/cloudsqlconn`をインポートする。 
+
+## projectの作成と設定
+
+プロジェクトを指定する
+```
+gcloud config set project chatfluent-409007
 ```
 
-app.yamlを作成する.
-[ドキュメント](https://cloud.google.com/appengine/docs/standard/go/building-app?hl=ja)
+API権限を与える
+```
+gcloud services enable compute.googleapis.com sqladmin.googleapis.com \
+  run.googleapis.com artifactregistry.googleapis.com \
+  cloudbuild.googleapis.com servicenetworking.googleapis.com
+```
+
+サービスアカウントを作成する
+```
+$ gcloud iam service-accounts create chatfluent-service-account \ 
+  --display-name="Chatfluent Service Account" 
+```
+
+適切なロールをサービスアカウントに与える
+```
+$ gcloud projects add-iam-policy-binding chatfluent-409007 \
+ --member="serviceAccount:chatfluent-service-account@chatfluent-409007.iam.gserviceaccount.com" \
+  --role="roles/cloudsql.client"
+
+```
+
+```
+$ gcloud projects add-iam-policy-binding chatfluent-409007 \
+--member="serviceAccount:chatfluent-service-account@chatfluent-409007.iam.gserviceaccount.com" \
+--role="roles/cloudsql.instanceUser"
+```
+
+```
+$ gcloud projects add-iam-policy-binding chatfluent-409007 \
+--member="serviceAccount:chatfluent-service-account@chatfluent-409007.iam.gserviceaccount.com" \
+--role="roles/logging.logWriter"
+```
+
+
+
+### Cloud SQLの作成
+
+インスタンスの作成
+```
+gcloud sql instances create chatfluent-instance \
+ --database-version=POSTGRES_14 \
+ --cpu=1 \
+ --memory=4GB \
+ --region=us-central1\
+ --database-flags=cloudsql.iam_authentication=on \
+ --root-password=chat
+```
+
+```
+gcloud sql databases create chatfluent_db --instance=chatfluent-instance
+```
+
+```
+ gcloud sql users create chatfluent-service-account@chatfluent-409007.iam \
+ --instance=chatfluent-instance \
+ --type=cloud_iam_service_account
+```
+
+Cloud SQLに`setup.sql`を流し込む。
+
+このとき、アプリケーションのサービスアカウントを選択する(ここ大事)。  
+
+
+```
+gcloud run deploy chatfluent \
+  --region=us-central1 \
+  --source=. \
+  --set-env-vars INSTANCE_CONNECTION_NAME="chatfluent-409007:us-central1:chatfluent-instance" \
+  --set-env-vars DB_NAME="chatfluent_db" \
+  --set-env-vars DB_USER="chatfluent-service-account@chatfluent-409007.iam" \
+  --service-account="chatfluent-service-account@chatfluent-409007.iam.gserviceaccount.com" \
+  --allow-unauthenticated
+```
+
+
+### ローカル実行
+
+```
+gcloud beta code dev --application-default-credential
+```
+
+データベースとの接続
+```
+gcloud beta sql connect chatfluent-instance --database=chatfluent_db
+```
 
 
 

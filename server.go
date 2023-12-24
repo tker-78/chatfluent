@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"text/template"
 	"time"
 
@@ -31,7 +32,7 @@ func startServer() {
 	mux.HandleFunc("/post/delete", postDelete)
 
 	server := &http.Server{
-		Addr:           config.Address,
+		Addr:           ":" + os.Getenv("PORT"),
 		Handler:        mux,
 		ReadTimeout:    time.Duration(config.ReadTimeout * int64(time.Second)),
 		WriteTimeout:   time.Duration(config.WriteTimeout * int64(time.Second)),
