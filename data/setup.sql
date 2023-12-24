@@ -1,7 +1,3 @@
-DROP TABLE users;
-DROP TABLE sessions;
-DROP TABLE threads;
-DROP TABLE posts;
 
 CREATE TABLE IF NOT EXISTS users (
   id serial PRIMARY KEY NOT NULL,
@@ -36,4 +32,3 @@ CREATE TABLE IF NOT EXISTS posts (
   thread_id INTEGER REFERENCES threads(id) ON DELETE CASCADE,
   created_at TIMESTAMP NOT NULL
 );
-

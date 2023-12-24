@@ -6,7 +6,11 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 
+	"cloud.google.com/go/cloudsqlconn"
+	"cloud.google.com/go/cloudsqlconn/postgres/pgxv4"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
@@ -14,11 +18,33 @@ var DbConnection *sql.DB
 
 func init() {
 	var err error
-	DbConnection, err = sql.Open("postgres", "dbname=chatfluent sslmode=disable")
+	err = godotenv.Load()
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
-	return
+	// production environment
+	if os.Getenv("environment") == "production" {
+		_, err = pgxv4.RegisterDriver("cloudsql-postgres", cloudsqlconn.WithIAMAuthN())
+		if err != nil {
+			log.Fatalf("Error on pgxv4.RegisterDriver: %v", err)
+		}
+
+		dsn := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable", os.Getenv("INSTANCE_CONNECTION_NAME"), os.Getenv("DB_USER"), os.Getenv("DB_NAME"))
+		DbConnection, err = sql.Open("cloudsql-postgres", dsn)
+		if err != nil {
+			log.Fatalf("Error on sql.Open: %v", err)
+		}
+	} else if os.Getenv("environment") == "development" {
+		// todo
+		DbConnection, err = sql.Open("postgres", "dbname=chatfluent sslmode=disable")
+		if err != nil {
+			log.Fatalln(err)
+		}
+		return
+
+	} else {
+		log.Fatalln("cannot read environment")
+	}
 }
 
 func createUUID() (uuid string) {
