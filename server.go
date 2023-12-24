@@ -9,11 +9,12 @@ import (
 	"time"
 
 	"example.com/tker-78/chatfluent/data"
+	"github.com/joho/godotenv"
 )
 
 func startServer() {
 	mux := http.NewServeMux()
-	files := http.FileServer(http.Dir(config.Static))
+	files := http.FileServer(http.Dir(Config.Static))
 	mux.Handle("/static/", http.StripPrefix("/static/", files))
 
 	mux.HandleFunc("/top", top)
@@ -32,14 +33,28 @@ func startServer() {
 	mux.HandleFunc("/post/delete", postDelete)
 
 	server := &http.Server{
-		Addr:           ":" + os.Getenv("PORT"),
+		Addr:           portNumber(),
 		Handler:        mux,
-		ReadTimeout:    time.Duration(config.ReadTimeout * int64(time.Second)),
-		WriteTimeout:   time.Duration(config.WriteTimeout * int64(time.Second)),
+		ReadTimeout:    time.Duration(Config.ReadTimeout * int64(time.Second)),
+		WriteTimeout:   time.Duration(Config.WriteTimeout * int64(time.Second)),
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	server.ListenAndServe()
+	fmt.Println(server.ListenAndServe())
+
+}
+
+func portNumber() (port string) {
+	err := godotenv.Load()
+	if err != nil {
+		log.Println(err, "cannot read .env file")
+	}
+	if os.Getenv("environment") == "production" {
+		port = ":" + os.Getenv("PORT")
+	} else if os.Getenv("environment") == "development" {
+		port = fmt.Sprintf(":%s", os.Getenv("localport"))
+	}
+	return
 
 }
 

@@ -27,10 +27,11 @@ type Configuration struct {
 	ReadTimeout  int64
 	WriteTimeout int64
 	Static       string
+	Environment  string
 }
 
 // アプリケーション全体で変数にアクセスできるようにグローバル宣言
-var config Configuration
+var Config Configuration
 var logger *log.Logger
 
 func init() {
@@ -49,8 +50,8 @@ func loadConfig() {
 		log.Fatalln("Failed to open config file", err)
 	}
 	decoder := json.NewDecoder(file)
-	config = Configuration{}
-	err = decoder.Decode(&config)
+	Config = Configuration{}
+	err = decoder.Decode(&Config)
 	if err != nil {
 		log.Fatalln("Cannot get configuration from file", err)
 	}

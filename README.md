@@ -263,16 +263,7 @@ gcloud run deploy chatfluent \
 
 ### ローカル実行
 
-```
-gcloud beta code dev --application-default-credential
-```
+ローカルでのテスト環境構築のため、
+設定ファイルで`production`と`development`を切り替えられるようにする。
 
-データベースとの接続
-```
-gcloud beta sql connect chatfluent-instance --database=chatfluent_db
-```
-
-
-
-
-
+ config.jsonで設定する。
