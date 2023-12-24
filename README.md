@@ -266,4 +266,11 @@ gcloud run deploy chatfluent \
 ローカルでのテスト環境構築のため、
 設定ファイルで`production`と`development`を切り替えられるようにする。
 
- config.jsonで設定する。
+.envを使って、
+```
+environment=production // or development
+```
+として切り替えできるようにする。
+データベースの初期化の部分と、サーバーのポート番号の部分を切り替えられるようにする。
+
+実装は、`data.go`と`server.go`を参照のこと。 
